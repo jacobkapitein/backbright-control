@@ -1,0 +1,51 @@
+#!/bin/bash
+while getopts m:v: option
+do
+case "${option}"
+in
+m) mode=${OPTARG};;
+v) value=${OPTARG};;
+esac
+done
+
+if [ "$mode" != "increase" ] && [ "$mode" != "i" ] && [ "$mode" != "decrease" ] && [ "$mode" != "d" ]
+then
+	echo "Error: paramater mode is not a valid value. You can use increase or decrease" >&2; exit 1
+fi
+
+re='^[0-9]+$'
+if ! [[ $value =~ $re ]] ; then
+	echo "Error: parameter value not a number" >&2; exit 1
+fi
+
+# All checks have been completed, start the script
+
+maxBrightness=$(</sys/class/backlight/intel_backlight/max_brightness)
+minBrightness=$(($maxBrightness/20))
+currentBrightness=$(</sys/class/backlight/intel_backlight/brightness)
+newBrightness=$maxBrightness
+
+
+
+if [ "$mode" == "increase" ] || [ "$mode" == "i" ]
+then
+	newBrightness=$(($currentBrightness+$value))
+elif [ "$mode" == "decrease" ] || [ "$mode" == "d" ]
+then
+	newBrightness=$(($currentBrightness-$value))
+fi
+
+# Check if brightness isn't too high or too low
+if [ "$newBrightness" -gt "$maxBrightness" ]
+then
+	echo "Error: new brightness is way too HIGH. Setting brightness to max"
+	newBrightness=$maxBrightness
+elif [ "$newBrightness" -lt "$minBrightness" ]
+then
+	echo "Error: new brightness is way too LOW. You can't see shit that way... Setting brightness to minimum"
+	newBrightness=$minBrightness
+fi
+
+echo "Last brightness: $currentBrightness"
+echo "Setting brightness to $newBrightness"
+echo $newBrightness > /sys/class/backlight/intel_backlight/brightness
