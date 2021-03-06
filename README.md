@@ -16,6 +16,8 @@ This is basically the first "big" bash script that I wrote. Any feedback is welc
 `-m` supports as input `increase`, `i`, `decrease` and `d`. These represent whether you want your screen to brighten up or down.
 `-v` uses a value. I recommend you test this input with multiple values to find the one that best fits your use. I will explain this in a later paragraph.
 
+Example: `backbright-control -m i -v 750` to increase the screens brightness with a raw value of 750.
+
 # How minimum and maximum values are calculated
 The maximum value of the screens brightness is calculated by reading `/sys/class/backlight/intel_backlight/max_brightness`.
 The minimum value is calculated by taking the max value of the screen and dividing that by 20. If you feel like that isn't enough, or maybe too much for you, I recommend you cange this value to a bigger or smaller one.
